@@ -3,7 +3,7 @@ interface BaseCMSField {
 }
 
 interface PlainCMSField extends BaseCMSField {
-  type: "varint" | "boolean" | "string";
+  type: "varint" | "boolean" | "string" | "string-repeat";
 }
 
 export interface CMSFieldGroupOrPacked extends BaseCMSField {

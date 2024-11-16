@@ -15,12 +15,19 @@ export class ProtobufHandler {
         return this.readVarint();
       case "string":
         return this.#buffer.toString();
+      case "string-repeat":
+        const strs = [];
+        while (this.hasMore()) {
+          strs.push(this.readBlock().toString());
+        }
+        return strs;
       case "group":
         return this.startParsing(this, proto);
     }
   }
   parseProto(proto: Record<number, CMSField>) {
     this.preprocess();
+    console.log(this.fields);
 
     const block: Record<string, any> = {};
 
