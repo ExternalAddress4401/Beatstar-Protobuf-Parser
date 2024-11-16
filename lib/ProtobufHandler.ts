@@ -34,6 +34,10 @@ export class ProtobufHandler {
       const fields = this.fields[key];
       for (const field of fields) {
         const entry = proto[key];
+        if (!entry) {
+          block[key] = field;
+          continue;
+        }
         if (entry.type === "group") {
           if (!Array.isArray(block[entry.name]) && block[entry.name]) {
             block[entry.name] = [block[entry.name]];
@@ -94,6 +98,8 @@ export class ProtobufHandler {
           this.fields[key.field] = [];
         }
         this.fields[key.field].push(this.readBlock());
+      } else if (key.wire === 5) {
+        this.#index += 4;
       }
     }
     this.#index = 0;
