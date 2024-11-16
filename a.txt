@@ -1,0 +1,22 @@
+{
+  "version": "28.0.0.537",
+  "fontConfig": {
+    "preferredFallbackFontsMacOS": [
+      "Arial Unicode"
+    ],
+    "preferredFallbackFontsWindows": [
+      "DengXian",
+      "MSGothic",
+      "GulimChe"
+    ],
+    "preferredFallbackFontsAndroid": [
+      "NotoSansCJK-Regular",
+      "NotoNaskhArabicUI-Regular"
+    ],
+    "preferredFallbackFontsiOS": [
+      "HiraginoMincho",
+      "Arial",
+      "AppleSDGothicNeo"
+    ]
+  }
+}

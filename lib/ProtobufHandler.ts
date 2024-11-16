@@ -27,7 +27,6 @@ export class ProtobufHandler {
   }
   parseProto(proto: Record<number, CMSField>) {
     this.preprocess();
-    console.log(this.fields);
 
     const block: Record<string, any> = {};
 
@@ -48,6 +47,15 @@ export class ProtobufHandler {
               entry.fields
             );
           }
+        } else if (entry.type === "packed") {
+          block[entry.name] = [];
+          const buffer = new ProtobufHandler(field);
+          while (buffer.hasMore()) {
+            const c = buffer.readBlock();
+            const b = new ProtobufHandler(c);
+            b.preprocess();
+            block[entry.name].push(b.parseProto(entry.fields));
+          }
         } else {
           block[entry.name] = new ProtobufHandler(field).parseField(entry);
         }
@@ -65,7 +73,7 @@ export class ProtobufHandler {
         const entry = proto.fields[key];
         const handlers = handler.fields[key];
         if (handlers) {
-          block[entry.name] = handlers.map((field) =>
+          block[entry.name] = handlers.map((field: any) =>
             new ProtobufHandler(field).parseField(proto.fields[key])
           );
         }
@@ -79,7 +87,9 @@ export class ProtobufHandler {
   preprocess() {
     while (this.#index < this.#buffer.length) {
       const key = this.readKey();
-      if (key.wire === 2) {
+      if (key.wire === 0) {
+        this.fields[key.field] = [this.readVarintBuffer()];
+      } else if (key.wire === 2) {
         if (!this.fields[key.field]) {
           this.fields[key.field] = [];
         }
@@ -112,6 +122,17 @@ export class ProtobufHandler {
 
     const varint = bytes.map((byte) => pad(byte.toString(2), 7, "0")).join("");
     return parseInt(varint, 2);
+  }
+  readVarintBuffer() {
+    let bytes = [];
+    while (true) {
+      const byte = this.readByte();
+      bytes.push(byte);
+      if ((byte & 0x80) === 0) {
+        break;
+      }
+    }
+    return Buffer.from(bytes);
   }
   readBlock() {
     const length = this.readVarint();
